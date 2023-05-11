@@ -1,0 +1,197 @@
+Initiation:
+1. Finish a01 process data. Get filt_neurons.mat file
+2. Copy all files in clustering pipeline folder to your experiment's (on teams) analysis folder
+3. Open Rstudio and save a new project
+	File - new project - existing directory -> save in your analysis folder (on teams)
+4. Open 00
+	Write a new convert_yyyymmdd = function() with todays date, filt_neurons file name and barseqrds(todaysdate)
+	example:
+	convert_20230331 = function() {
+  	sce = convert_v7_filtneurons("filt_neurons_subset.mat")
+ 	saveRDS(sce, "barseq_20230331.rds")    
+	}
+
+	Change last line to new convert function
+	example:
+	if (sys.nframe() == 0) {
+  	convert_20230331()
+	}
+	save
+5. Open dataset.R
+	on line 8, change barseqrds to same file in 00 
+	example:
+	load_barseq = function(filename="barseq_20220331.rds"...
+	save
+
+
+H1 Clustering: (inhibitory/excitatory/subcortical types)
+6. open 03
+	Lines 8-15:
+	Make sure on first clustering run, all lines commented out except "analyze whole"
+	example: 
+	main = function() {
+    	barseq = load_barseq(normalization_factor = 10)
+    	logcounts(barseq) = log1p(cpm(barseq))/log(2)
+    
+    	analyze_whole(barseq)
+    	#analyze_glu(barseq)
+    	#analyze_gaba(barseq)
+    	#subcluster_glu(barseq)
+	save
+7. open 04
+	lines 8-14
+	Make sure on first clustering run, all lines commented out except -plot_analysis("analysis/whole", "figs/whole")
+	example:
+	main = function() {
+   	 plot_analysis("analysis/whole", "figs/whole")
+  	  #plot_analysis("analysis/glu", "figs/glu")
+  	  #plot_analysis("analysis/gaba", "figs/gaba")
+ 	  #plot_subglu()
+  	  #plot_analysis("analysis/IT45","figs/IT45")
+	}
+	save
+8. In terminal type: Initial00to04.bat
+	run
+	This will take a few hours, depending on your data size
+
+9. Open pdfs, visualizations are stored in figs -> whole. 
+	open preliminary_analysis to look at full umap. Make sure it looks smooth/converged. Keep this up
+	open all_slices. Check for any obvious batch effects or issues with slices
+	In "slice" subfolder, open a representative slice. 
+10. Open 05, change names to annotate whole clusters (annotate_whole)
+	Make sure you have right number of cluster for this dataset, it will change 
+	For each cluster, mark it "Glu_#", "GABA_#", or "SubCTX_#", with a unique number for each cluster. 
+		Which number goes to which cell type is unimportant.
+	Generally data usually fall in two major clusters, GABA and Glu, which are separated by inhibitory and excitatory
+		markers in the preliminary analysis pdf. Use this pdf primarily to distinguish H1 subtypes. GLU clusters
+		have high expression of exciatory Slc17a7, and GABA have high expression of inhibitory marker Gad1, but 
+		for GABA not all of the clusters in this class may have high levels of Gad1. Use Slc17a7 exp to distinguish
+		main H1 types. 
+	Only mark a cluster GABA_# or GLU_# if some neurons are in the cortex/hippocampus, otherwise mark SubCTX
+11. When you have annotated all clusters, change main function so annotate_whole() is uncommented
+	example:
+	main = function() {
+    	annotate_whole()
+   	#annotate_glu()
+	#annotate_gaba()
+	#annotate_subglu()
+	}
+	save
+12. Run 05
+13. Open 03
+	comment out analyze_whole()
+	uncomment analyze_glu() and analyze_gaba()
+14. Open 04
+	comment out  plot_analysis("analysis/whole", "figs/whole")
+	uncomment  plot_analysis("analysis/glu", "figs/glu")
+	uncomment  plot_analysis("analysis/gaba", "figs/gaba")
+15. In terminal type: Iterate03to04.bat
+	run
+	This will take a few hours, depending on your data size
+
+
+H2 Clustering:  (subclass level spearated by inhibitory and excitatory types)
+16. Open pdfs for glutamate+ cells, visualizations are stored in figs -> glu. 
+	open preliminary_analysis to look at glutamate umap. Make sure it looks smooth/converged. Keep this up
+	open all_slices. Check for any obvious batch effects or issues with slices
+	open marker_scores.pdf. This is particularily useful for picking out exciatatory 
+	in "cell_types" subfolder, open each type as you go to label cell types
+17. open 05, change names to annotate glu clusters (annotate_glu)
+	Annotate each cluster. For typical datasets containing cortical neurons, there is one cluster for each of these 
+		main cortical exciatory cell types: (name with underscores, slashes break later scripts)
+	L2_3_IT
+	L4_5_IT
+	L5_IT
+	L6_IT
+	L5_ET
+	L6_CT
+	L6b
+	NP
+	Car3
+		These clusters can be distinugished by their cortical depth, typical distributions, and by the relative
+		weight of marker scores in that area of the glu umap. 
+		All other clusters that don't fall into these categories can be labeled descriptively, for example
+	Pir
+	CA1
+	CA3
+	BLA
+	Low_qual
+
+	save
+18. Repeat these steps and annotate GABA subtypes. In our datasets we are not currently optimizing for specific detection of 
+	GABA subtypes. Therefore, we usually justn name each cluster "gaba_#"
+	example:
+	annotate_gaba = function(output_dir = "analysis/gaba") {
+   	 cluster_annotation = tribble(
+       	 ~cluster_id, ~cluster, ~subclass,
+    		  1, "gaba_1","gaba_1",
+   	          2, "gaba_2","gaba_2",
+        	  3, "gaba_3","gaba_3",
+      		  4, "gaba_4","gaba_4",
+      		  5, "gaba_5","gaba_5",
+	Make sure you label all the clusters. You can be more descriptive if you like, or label some "low_qual", etc
+	
+	save
+19.  When you have annotated all clusters, change main function so annotate_glu() and annotate_gaba are uncommented
+	example:
+	main = function() {
+    	#annotate_whole()
+   	annotate_glu()
+	annotate_gaba()
+	#annotate_subglu()
+	}
+	save
+20. Run 05
+21. Open 03
+	Comment out analyze_glu() and analyze_gaba()
+	Uncomment subcluster_subglu()
+	save
+22. Open 04
+	comment out  plot_analysis("analysis/glu", "figs/glu")
+	comment out  plot_analysis("analysis/gaba", "figs/gaba")
+	Uncomment plot_subglu
+	save
+23. In terminal type: Iterate03to04.bat
+	run
+	This will take a few hours, depending on your data size
+
+H3 labeling (type level, within subclass. Only glutamate cell types)
+
+NOTE - be very careful here to get the NAMES of the cluster_id and the NUMBER of each correct, any deviation will break
+	the code that assigns these labels in filt_neurons
+
+24. Name and label each subcluster for glutamate cell types. This goes in this order:
+	 ~cluster_id, ~cluster, ~subclass,~notes,
+	cluster_id - must match exactly to the name of subclass_#. E.g. if you called your H2 type L5_ET, and there are 8
+		clusters, you must write L5_ET_# for all 8. 
+	cluster - gives your cluster a descriptive name. You can just write out cluster_id again if you don't want to 
+		be more descriptive. 
+	subclass - is the H2 type this subcluster belongs to. Typically, this will be the same as the original designation
+		(e.g. L5_ET) but occasionally you get mixed clusters where one of the subclusters is actually part of 
+		another subclass. Designate this accordingly. 
+	notes - any notes on this subclass, longer description, or leave blank
+
+Example, non descriptive
+
+        "L5_IT_1","L5_IT 1","L5_IT"," ",
+        "L5_IT_2","L5_IT 2","L5_IT"," ",
+        "L5_IT_3","BLA 1","BLA"," ",
+        "L5_IT_4","L5_IT 4","L5_IT"," ",
+
+Example, more descriptive
+
+        "L5_IT_1","L5_IT lateral","L5_IT"," lateral L5IT type",
+        "L5_IT_2","L5_IT ventral","L5_IT"," ventral L5IT type enriched in SST",
+        "L5_IT_3","BLA medial","BLA","medial basolateral amygdala ",
+        "L5_IT_4","L5_IT RSP","L5_IT","L5IT type restricted to RSP",
+
+	save
+25. Uncomment annotate_subglu() in 05 and comment out other lines in main function. Run 05
+
+Add all cluster names to filt_neurons in MATLAB
+26. open a01_0_assignclusterlabels.m 
+	Change name of filt_neurons file, line 4
+	If you want, change the name of the new filename to be saved, line 15
+	Run
+	*if you get an error, it is probably because you have the wrong number/names of clusters in the annotation. 
+	Check annotation for H3 types in particualr, but also H2 types. 

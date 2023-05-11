@@ -1,2 +1,2 @@
 # barseq-allen
-Code and config for BARseq from Xiaoyin Chen's lab at the Allen Institute
+Code and configuration for Nikon BARseq microscopy as used by Xiaoyin Chen at the Allen Institute.

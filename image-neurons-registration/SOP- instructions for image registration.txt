@@ -1,0 +1,58 @@
+Script #1: 
+a00_preprocessbarseq_todaysdate.m
+
+Setup for new computers:
+Change all paths to point to your python environments
+	line 163 (n2v processing)
+	line 335 (n2v geneonly)
+	line 365 (bardensr)
+Set number of workers to number of cores at beginning, and also within functions
+*make sure your parallel pool is configured and set to never shut down
+	line 4
+	line 431
+	line 471
+	line 536
+Put folder "n2v models" onto disk you are registering on (same level as experiment folder)
+in n2vprocessing.py (and other n2v python scripts), change path to n2v model folder if necessary (default is e://n2v_models)	
+
+Necessary files:
+raw images for geneseq, hybridization cycle and/or barseq cycles (geneseq0n... bcseq0n... hyb01)
+n2vprocessing.py **note! If different number of geneseq cycles from default of 7, change this code accordingly
+n2vprocessing_bc.py **same note as above
+codebookM1all.mat **may change based on your gene panel
+codebookhyb.mat
+
+
+Notes for running
+Run from beginning to end, if you have only geneseq and hyb cycles it will run fine and break when it tries to 
+	organize bcseq. 
+First time you run this on new computer, may want to run one section at a time
+We may be updating the stitching section. For now, this also requires plugins for FIJI, and a link to 
+	the correct path
+
+
+Script #2
+a01_processbarseq_todaysdate.m
+Setup for new computers:
+Change all paths to point to your python environments
+	line 201 (n2v processing)
+	line 237 (bardensr)
+	Line 273 (cellpose)
+Set number of workers to number of cores at beginning, and also within functions
+*make sure your parallel pool is configured and set to never shut down
+	line 308
+	line 446
+	line 410
+
+BEFORE running code:
+1. Add multiplier to line 14 if this is not the only batch of slides in your experiment. 
+2. Change starting slide idx on line 65
+
+Necessary files:
+All files created by a00
+bardensrbasecall.py
+bardensrbasecall_predefinedthresh.py
+thresh_refined.txt
+Cellsegmentation-v065.py
+
+

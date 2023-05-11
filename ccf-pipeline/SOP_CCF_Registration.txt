@@ -1,0 +1,96 @@
+Start with filt_neurons file with clustid and subclass labels
+
+On new devices, download:
+QuickNii (v.3 2017) 
+VisuAlign (v. 0.9)
+from ebrains.edu
+
+Create conda env for ccf registration 
+	conda create -n ccf_registration python=3.9
+	conda activate ccf_registration
+	conda install -c conda-forge matplotlib
+	conda install pandas
+	conda install -c anaconda seaborn
+	conda install -c plotly plotly
+	conda install -c anaconda jupyter
+	conda install -c conda-forge opencv
+	pip uninstall pillow
+	pip install pillow==8.0.0
+	pip install opencv-contrib-python
+	conda deactivate
+
+Create conda env for ccf streamline
+	conda create -n ccf_streamline python=3.11
+	conda activate ccf_streamline
+	pip install ccf-streamlines
+	conda install -c anaconda seaborn
+	conda install -c conda-forge matplotlib
+	conda install pandas
+	conda install -c anaconda jupyter
+	conda deactivate
+
+
+	go to your conda environment (c:\User\your name\Anaconda3\envs\ccf_registration\Lib\site-packages\ccf_streamlines )
+	delete projection.py
+	cope projection_removed_singlets.py into this directory
+	go to .\Anaconde3\Lib\site-packages\ccf_streamlines
+	delete projection.py
+	cope projection_removed_singlets.py into this directory 
+
+
+
+
+1. Make a subfolder within your analysis folder (on teams) called "image registration"
+	In here, put:
+		Every files in CCF Registration Pipeline
+
+2. Make small images for registration using step1_prepare_registration_image_and_datafile.m
+	Change filt_neurons filename if necessary in line 4
+	Run
+
+	This will create:
+	 a folder called "newsliceimages" with a small image for each slice in your dataset
+	 filt_neurons.csv - a .csv file with important data from filt_neurons 
+	
+3. Go to the QuckNii application folder, build a file with all the images
+	Open FileBuilder.bat
+	Navigate to your newsliceimages folder for this experiment -> small 
+	Select all slices you want to register, click open
+	Click save XML button at the bottom left
+	Save as images.xml in the newsliceimages folder
+
+4. Open QuickNii and load the images.xml file (manage data -> load .xml)
+
+5. Use QuickNii to find approximate CCF slice, size and tilt distortion of each section. If it doesn't match exactly because
+	of wrinkling or stretching that is fine, it will be fixed in the next step. 
+
+	Some tips for using QuickNii:
+	Use the Rainbow 2017 version in top left dropdown for aligning
+	Use slider on far left to change opacity of slice and CCF cartoon
+	Drag on the sagital plane right hand side to get approximate coronal section
+	Press space to set an anchor point and use arrows on top to set direction of distoriton, then drag with mouse to reposition
+	When you are happy with the match, click store in the upper left corner
+	Start with a few slices with obvious landmarks/structures. They can be far apart. The software interpolates
+
+	Save .json file in newsliceimages as quicknii.json
+
+6. Use Visualign to exactly align each slice to CCF
+	Press space to make anchors and drag with mouse to align
+	Customize colors of anchors and outline for ease of use
+	Hover over anchor and press backspace to delete one
+	
+	save .json file as bisualign.json
+
+7. Run python script
+	 open Anaconda powershell
+         conda activate ccf_registration 
+	 cd your work dir 
+ 	 python step2_CCFregistration.py
+	when finish run
+	step3_ccfstreamlines.py
+	
+8. Run step4_Match_CCF_Area.m 
+	using streamlines_registred_filt_neurons
+	Add to newest filt_neurons.mat
+9. Run Step5_Add CCF_to_neurons.mat
+	Need to run this step to add streamline coordinates
